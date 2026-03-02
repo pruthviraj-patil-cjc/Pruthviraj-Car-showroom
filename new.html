@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoShow Elite ULTIMATE - 3D Car Configurator PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --secondary: #b71c1c;
+            --accent: #ff6b35;
+            --dark: #1a1a1a;
+            --glass: rgba(255,255,255,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
+
+        /* Particles */
+        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+
+        /* Navbar */
+        .navbar {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(30px);
+            padding: 1rem 0; box-shadow: 0 10px 40px rgba(211,47,47,0.3);
+        }
+
+        .nav-container { display: flex; justify-content: space-between; align-items: center; }
+        .logo h2 { color: var(--primary); font-weight: 800; font-size: 2.2rem; }
+        .nav-menu { display: flex; gap: 3rem; list-style: none; }
+        .nav-menu a { color: white; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+        .nav-menu a:hover { color: var(--primary); }
+
+        /* Main Control Panel */
+        .control-panel {
+            position: fixed; top: 90px; right: -500px; width: 500px; height: calc(100vh - 90px);
+            background: rgba(0,0,0,0.98); backdrop-filter: blur(40px);
+            transition: right 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+            z-index: 999; padding: 3rem; overflow-y: auto;
+            box-shadow: -20px 0 60px rgba(211,47,47,0.4);
+        }
+        .control-panel.active { right: 0; }
+
+        .control-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; }
+        .tab-btn { 
+            flex: 1; padding: 1rem; background: rgba(211,47,47,0.3); 
+            border: none; border-radius: 20px; color: white; cursor: pointer;
+            transition: all 0.3s; font-weight: 600;
+        }
+        .tab-btn.active { background: var(--primary); transform: scale(1.05); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        .color-swatch { display: inline-block; width: 50px; height: 50px; margin: 0.5rem; border-radius: 12px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s; position: relative; }
+        .color-swatch.active { border-color: white; box-shadow: 0 0 20px currentColor; transform: scale(1.2); }
+        .rim-option { width: 80px; height: 80px; background-size: cover; background-position: center; border-radius: 15px; margin: 0.5rem; cursor: pointer; border: 3px solid transparent; transition: all 0.3s; }
+        .rim-option.active { border-color: var(--primary); box-shadow: 0 0 25px var(--primary); transform: scale(1.15); }
+
+        /* 3D Viewer */
+        .viewer-section { padding: 150px 0 100px; min-height: 100vh; background: radial-gradient(circle at center, rgba(211,47,47,0.1), transparent); }
+        .section-title { 
+            text-align: center; font-size: clamp(3rem, 6vw, 5rem); margin-bottom: 6rem; 
+            background: linear-gradient(45deg, var(--primary), var(--accent)); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .ultimate-viewer {
+            height: 700px; perspective: 1800px; position: relative; margin: 0 auto;
+            max-width: 1000px; border-radius: 40px; overflow: hidden;
+            background: linear-gradient(145deg, rgba(0,0,0,0.9), rgba(211,47,47,0.1));
+            backdrop-filter: blur(50px); box-shadow: 0 60px 200px rgba(0,0,0,0.8);
+        }
+
+        .car-3d-model {
+            position: absolute; top: 50%; left: 50%; width: 600px; height: 350px;
+            transform: translate(-50%, -50%) rotateX(20deg) rotateY(0deg) scale(1);
+            transform-style: preserve-3d; transition: transform 0.2s ease-out;
+            cursor: grab;
+        }
+        .car-3d-model:active { cursor: grabbing; }
+
+        .car-face {
+            position: absolute; width: 100%; height: 100%; border-radius: 30px;
+            background-size: cover; background-position: center;
+            transition: all 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.7); border: 4px solid rgba(255,255,255,0.3);
+        }
+
+        .car-front { transform: rotateY(0deg) translateZ(300px); }
+        .car-back { transform: rotateY(180deg) translateZ(300px); }
+        .car-left { transform: rotateY(-90deg) translateZ(300px); }
+        .car-right { transform: rotateY(90deg) translateZ(300px); }
+        .car-top { background: linear-gradient(45deg, #667eea, #764ba2) !important; transform: rotateX(90deg) translateZ(175px); height: 45px; }
+        .car-bottom { background: linear-gradient(45deg, var(--primary), var(--secondary)) !important; transform: rotateX(-90deg) translateZ(175px); height: 45px; }
+
+        /* Animation States */
+        .doors-open .car-front { transform: rotateY(25deg) translateZ(250px); }
+        .doors-open .car-right { transform: rotateY(75deg) translateZ(250px); }
+        .hood-open .car-front { transform: rotateY(0deg) translateZ(220px) rotateX(-25deg); }
+        .trunk-open .car-back { transform: rotateY(180deg) translateZ(220px) rotateX(20deg); }
+
+        /* Hotspots */
+        .hotspot {
+            position: absolute; width: 40px; height: 40px; background: var(--primary);
+            border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; transition: all 0.3s; z-index: 10; box-shadow: 0 5px 20px rgba(211,47,47,0.6);
+        }
+        .hotspot:hover { transform: scale(1.3); box-shadow: 0 10px 30px rgba(211,47,47,0.9); }
+
+        .hotspot-info {
+            position: absolute; background: rgba(0,0,0,0.95); color: white; padding: 1rem 1.5rem;
+            border-radius: 15px; backdrop-filter: blur(20px); font-weight: 600; white-space: nowrap;
+            transform: translateX(-50%) scale(0); transition: all 0.3s; z-index: 20;
+        }
+        .hotspot:hover .hotspot-info { transform: translateX(-50%) scale(1); }
+
+        /* Mobile Optimized Controls */
+        .mobile-controls {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 1rem; background: rgba(0,0,0,0.9); padding: 1.5rem; border-radius: 50px;
+            backdrop-filter: blur(30px);
+        }
+        .mobile-btn {
+            width: 60px; height: 60px; border-radius: 50%; border: none; background: rgba(211,47,47,0.7);
+            color: white; font-size: 1.3rem; cursor: pointer; transition: all 0.3s;
+        }
+        .mobile-btn.active, .mobile-btn:hover { background: var(--primary); transform: scale(1.1); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .control-panel { right: -100vw; width: 100vw; }
+            .car-3d-model { width: 400px; height: 240px; }
+            .car-front, .car-back, .car-left, .car-right { transform: translateZ(200px); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container container">
+            <div class="logo"><h2><i class="fas fa-car-side"></i> AutoShow ULTIMATE</h2></div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#viewer">3D Configurator</a></li>
+            </ul>
+            <i class="fas fa-cog pro-toggle" id="controlToggle" style="font-size: 1.8rem; cursor: pointer; padding: 1rem; transition: 0.3s;" title="Controls"></i>
+        </div>
+    </nav>
+
+    <!-- ULTIMATE Control Panel -->
+    <div class="control-panel" id="controlPanel">
+        <div class="control-tabs">
+            <button class="tab-btn active" data-tab="colors">🎨 Colors</button>
+            <button class="tab-btn" data-tab="rims">🔧 Rims</button>
+            <button class="tab-btn" data-tab="features">🚪 Features</button>
+        </div>
+
+        <div id="colors" class="tab-content active">
+            <h3>Car Colors</h3>
+            <div class="color-swatch active" style="background: linear-gradient(145deg, #d32f2f, #b71c1c)" data-color="red"></div>
+            <div class="color-swatch" style="background: linear-gradient(145deg, #1976d2, #1565c0)" data-color="blue"></div>
+            <div class="color-swatch" style="background: linear-gradient(145deg, #388e3c, #2e7d32)" data-color="green"></div>
+            <div class="color-swatch" style="background: linear-gradient(145deg, #f57c00, #ef6c00)" data-color="orange"></div>
+            <div class="color-swatch" style="background: linear-gradient(145deg, #7b1fa2, #6a1b9a)" data-color="purple"></div>
+            <div class="color-swatch" style="background: linear-gradient(145deg, #424242, #212121)" data-color="matte-black"></div>
+        </div>
+
+        <div id="rims" class="tab-content">
+            <h3>Rim Styles</h3>
+            <div class="rim-option active" style="background-image: url('https://images.unsplash.com/photo-1434783561459-338a4e30217e?ixlib=rb-4.0.3&w=400')" data-rim="rim1"></div>
+            <div class="rim-option" style="background-image: url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?ixlib=rb-4.0.3&w=400')" data-rim="rim2"></div>
+            <div class="rim-option" style="background-image: url('https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&w=400')" data-rim="rim3"></div>
+            <div class="rim-option" style="background-image: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&w=400')" data-rim="rim4"></div>
+        </div>
+
+        <div id="features" class="tab-content">
+            <h3>Animations</h3>
+            <button class="mobile-btn" onclick="toggleDoors()" id="doorsBtn">🚪 Doors</button>
+            <button class="mobile-btn" onclick="toggleHood()" id="hoodBtn">🚗 Hood</button>
+            <button class="mobile-btn" onclick="toggleTrunk()" id="trunkBtn">📦 Trunk</button>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section id="home" style="height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+        <div style="max-width: 800px;">
+            <h1 style="font-size: clamp(3rem, 8vw, 6rem); font-family: 'Playfair Display', serif; background: linear-gradient(45deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2rem;">
+                Ultimate 3D Configurator
+            </h1>
+            <a href="#viewer" style="display: inline-flex; align-items: center; gap: 1rem; padding: 1.5rem 4rem; background: linear-gradient(45deg, var(--primary), var(--accent)); color: white; text-decoration: none; border-radius: 50px; font-weight: 700; font-size: 1.3rem; box-shadow: 0 25px 70px rgba(211,47,47,0.5);">
+                <i class="fas fa-rocket"></i> Start Customization
+            </a>
+        </div>
+    </section>
+
+    <!-- 3D Ultimate Viewer -->
+    <section id="viewer" class="viewer-section">
+        <div class="container">
+            <h2 class="section-title">🎨 Ultimate 3D Car Configurator</h2>
+            <div class="ultimate-viewer" id="carViewer">
+                <!-- Safety Hotspots -->
+                <div class="hotspot" style="top: 30%; left: 20%;" data-info="ABS Braking System">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="hotspot-info">ABS Braking</div>
+                </div>
+                <div class="hotspot" style="top: 40%; right: 25%;" data-info="7 Airbags">
+                    <i class="fas fa-life-ring"></i>
+                    <div class="hotspot-info">7 Airbags</div>
+                </div>
+                <div class="hotspot" style="bottom: 30%; left: 30%;" data-info="360° Camera">
+                    <i class="fas fa-video"></i>
+                    <div class="hotspot-info">360° Camera</div>
+                </div>
+                <div class="hotspot" style="bottom: 25%; right: 35%;" data-info="ESP Stability">
+                    <i class="fas fa-balance-scale"></i>
+                    <div class="hotspot-info">ESP Stability</div>
+                </div>
+
+                <div class="car-3d-model" id="carModel">
+                    <div class="car-face car-front" style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=90')"></div>
+                    <div class="car-face car-back" style="background-image: url('https://images.unsplash.com/photo-1605559424843-9e4c228fb7d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=90')"></div>
+                    <div class="car-face car-left" style="background-image: url('https://images.unsplash.com/photo-1570279508259-00995d3c27ec?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=90')"></div>
+                    <div class="car-face car-right" style="background-image: url('https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=90')"></div>
+                    <div class="car-face car-top"></div>
+                    <div class="car-face car-bottom"></div>
+                </div>
+            </div>
+            <div class="mobile-controls">
+                <button class="mobile-btn" onclick="resetView()" title="Reset"><i class="fas fa-sync-alt"></i></button>
+                <button class="mobile-btn active" onclick="rotateView(-45)" title="Left"><i class="fas fa-undo"></i></button>
+                <button class="mobile-btn active" onclick="rotateView(45)" title="Right"><i class="fas fa-redo"></i></button>
+                <button class="mobile-btn" onclick="zoomIn()" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+                <button class="mobile-btn" onclick="zoomOut()" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 3D State
+        let rotationY = 0, rotationX = 20, scale = 1, isDragging = false;
+        let prevX = 0, prevY = 0, doorsOpen = false, hoodOpen = false, trunkOpen = false;
+        let currentColor = 'red', currentRim = 'rim1';
+
+        // DOM Elements
+        const carModel = document.getElementById('carModel');
+        const carViewer = document.getElementById('carViewer');
+        const controlPanel = document.getElementById('controlPanel');
+        const controlToggle = document.getElementById('controlToggle');
+
+        // Mobile-First 3D Controls
+        function init3DControls() {
+            // Mouse
+            carViewer.addEventListener('mousedown', (e) => {
+                isDragging = true; prevX = e.clientX; prevY = e.clientY;
+                carModel.style.transition = 'none';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const deltaX = e.clientX - prevX;
+                const deltaY = e.clientY - prevY;
+                rotationY += deltaX * 0.5;
+                rotationX += deltaY * 0.3;
+                rotationX = Math.max(-45, Math.min(75, rotationX));
+                updateCarTransform();
+                prevX = e.clientX; prevY = e.clientY;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false; carModel.style.transition = 'transform 0.2s ease-out';
+            });
+
+            // Touch - MOBILE OPTIMIZED
+            carViewer.addEventListener('touchstart', (e) => {
+                isDragging = true; 
+                prevX = e.touches[0].clientX; 
+                prevY = e.touches[0].clientY;
+                carModel.style.transition = 'none';
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const deltaX = e.touches[0].clientX - prevX;
+                const deltaY = e.touches[0].clientY - prevY;
+                rotationY += deltaX * 0.5;
+                rotationX += deltaY * 0.3;
+                rotationX = Math.max(-45, Math.min(75, rotationX));
+                updateCarTransform();
+                prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
+            });
+
+            // Wheel zoom
+            carViewer.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                scale += e.deltaY * -0.001;
+                scale = Math.max(0.6, Math.min(2.2, scale));
+                updateCarTransform();
+            });
+        }
+
+        function updateCarTransform() {
+            carModel.style.transform = `translate(-50%, -50%) rotateX(${rotationX}deg) rotateY(${rotationY}deg) scale(${scale})`;
+        }
+
+        // Customization Functions
+        function applyColor(color) {
+            const colorMap = {
+                'red': 'linear-gradient(145deg, #d32f2f, #b71c1c)',
+                'blue': 'linear-gradient(145deg, #1976d2, #1565c0)',
+                'green': 'linear-gradient(145deg, #388e3c, #2e7d32)',
+                'orange': 'linear-gradient(145deg, #f57c00, #ef6c00)',
+                'purple': 'linear-gradient(145deg, #7b1fa2, #6a1b9a)',
+                'matte-black': '#424242'
+            };
+            
+            document.querySelector('.car-right').style.backgroundImage = `linear-gradient(145deg, ${colorMap[color]}, ${colorMap[color]})`;
+            document.querySelector('.car-left').style.backgroundImage = `linear-gradient(145deg, ${colorMap[color]}, ${colorMap[color]})`;
+            document.querySelector('.car-front').style.backgroundImage = `linear-gradient(145deg, ${colorMap[color]}, ${colorMap[color]})`;
+            document.querySelector('.car-back').style.backgroundImage = `linear-gradient(145deg, ${colorMap[color]}, ${colorMap[color]})`;
+            currentColor = color;
+        }
+
+        function applyRim(rim) {
+            const carBottom = document.querySelector('.car-bottom');
+            const rimImages = {
+                'rim1': 'https://images.unsplash.com/photo-1434783561459-338a4e30217e?ixlib=rb-4.0.3&w=400',
+                'rim2': 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?ixlib=rb-4.0.3&w=400',
+                'rim3': 'https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&w=400',
+                'rim4': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&w=400'
+            };
+            carBottom.style.backgroundImage = `url(${rimImages[rim]})`;
+            currentRim = rim;
+        }
+
+        // Animation Functions
+        function toggleDoors() {
+            doorsOpen = !doorsOpen;
+            carModel.classList.toggle('doors-open', doorsOpen);
+            document.getElementById('doorsBtn').classList.toggle('active', doorsOpen);
+        }
+
+        function toggleHood() {
+            hoodOpen = !hoodOpen;
+            carModel.classList.toggle('hood-open', hoodOpen);
+            document.getElementById('hoodBtn').classList.toggle('active', hoodOpen);
+        }
+
+        function toggleTrunk() {
+            trunkOpen = !trunkOpen;
+            carModel.classList.toggle('trunk-open', trunkOpen);
+            document.getElementById('trunkBtn').classList.toggle('active', trunkOpen);
+        }
+
+        // Mobile Quick Controls
+        function rotateView(angle) { rotationY += angle; updateCarTransform(); }
+        function zoomIn() { scale = Math.min(2.2, scale + 0.1); updateCarTransform(); }
+        function zoomOut() { scale = Math.max(0.6, scale - 0.1); updateCarTransform(); }
+        function resetView() {
+            rotationY = 0; rotationX = 20; scale = 1;
+            updateCarTransform();
+        }
+
+        // Event Listeners
+        controlToggle.addEventListener('click', () => controlPanel.classList.toggle('active'));
+
+        // Tab System
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Color & Rim Selection
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+                applyColor(this.dataset.color);
+            });
+        });
+
+        document.querySelectorAll('.rim-option').forEach(rim => {
+            rim.addEventListener('click', function() {
+                document.querySelectorAll('.rim-option').forEach(r => r.classList.remove('active'));
+                this.classList.add('active');
+                applyRim(this.dataset.rim);
+            });
+        });
+
+        // Safety Hotspots
+        document.querySelectorAll('.hotspot').forEach(hotspot => {
+            hotspot.addEventListener('click', function() {
+                alert(`Safety Feature: ${this.dataset.info}\n✅ Premium Safety Standard`);
+            });
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Particles
+        function initParticles() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const particles = [];
+            for(let i = 0; i < 150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 1,
+                    vy: (Math.random() - 0.5) * 1,
+                    r: Math.random() * 3 + 1
+                });
+            }
+            function animate() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                ctx.fillStyle = 'rgba(211,47,47,0.6)';
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                    ctx.fill();
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // Initialize
+        init3DControls();
+        initParticles();
+        updateCarTransform();
+    </script>
+</body>
+</html>

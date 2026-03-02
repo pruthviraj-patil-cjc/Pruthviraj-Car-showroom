@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Pruthviraj Car Showroom - Hyderabad</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh; padding: 1rem;
+            overflow-x: hidden;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header { 
+            text-align: center; color: white; margin-bottom: 3rem; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .header h1 { 
+            font-size: 3.5em; margin-bottom: 0.5rem; 
+            background: linear-gradient(45deg, #fff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 5px #fff); }
+            to { filter: drop-shadow(0 0 20px #ffd700); }
+        }
+
+        .search-container {
+            max-width: 900px; margin: 0 auto 3rem; 
+            position: relative;
+        }
+        #searchInput {
+            width: 100%; padding: 1.8rem 2.5rem; 
+            font-size: 1.6em; border: 3px solid transparent;
+            border-radius: 50px; background: rgba(255,255,255,0.95);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        #searchInput:focus {
+            outline: none; border-color: #ffd700; 
+            box-shadow: 0 0 30px rgba(255,215,0,0.5);
+            transform: scale(1.02);
+        }
+        .search-icon {
+            position: absolute; right: 20px; top: 50%;
+            transform: translateY(-50%); font-size: 1.8em;
+        }
+
+        .filters {
+            max-width: 900px; margin: 0 auto 2rem;
+            display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+        }
+        .filter-btn {
+            padding: 0.8rem 1.5rem; border: none;
+            border-radius: 30px; background: rgba(255,255,255,0.2);
+            color: white; cursor: pointer; font-weight: 600;
+            transition: all 0.3s ease; backdrop-filter: blur(10px);
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(255,255,255,0.9); color: #333;
+            transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .cars-container {
+            max-width: 1300px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .car-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px; padding: 2.5rem; text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 1; transform: translateY(0);
+            backdrop-filter: blur(15px); position: relative;
+            overflow: hidden;
+        }
+        .car-card::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 100%; height: 5px; background: linear-gradient(90deg, #ffd700, #ff6b6b);
+        }
+        .car-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 35px 70px rgba(0,0,0,0.3);
+        }
+        .car-card.hidden { 
+            opacity: 0.2; transform: scale(0.85) translateY(10px); 
+        }
+
+        .car-emoji { 
+            font-size: 5em; margin-bottom: 1.2rem; 
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .car-name { 
+            font-size: 2.2em; font-weight: 700; 
+            background: linear-gradient(45deg, #333, #666);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 1.2rem;
+        }
+        .car-specs { 
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 0.8rem; margin-bottom: 2rem; color: #555; 
+            font-size: 1.1em;
+        }
+        .car-price { 
+            font-size: 2.8em; 
+            background: linear-gradient(45deg, #ff6b6b, #ffd700);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-weight: 800; margin-bottom: 2rem;
+        }
+
+        .book-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d, #26a69a);
+            color: white; border: none; padding: 1.2rem 2.5rem;
+            border-radius: 50px; font-size: 1.3em; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(78,205,196,0.4);
+            position: relative; overflow: hidden;
+        }
+        .book-btn:hover { 
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 15px 40px rgba(78,205,196,0.6);
+        }
+        .book-btn:active {
+            transform: scale(0.98);
+        }
+
+        .stats-bar {
+            max-width: 900px; margin: 2rem auto;
+            background: rgba(255,255,255,0.2); padding: 1.5rem;
+            border-radius: 20px; backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; color: white;
+            text-align: center;
+        }
+        .stat { font-size: 1.4em; font-weight: 600; }
+
+        .no-results {
+            text-align: center; color: white; font-size: 2em;
+            grid-column: 1 / -1; padding: 5rem; font-weight: 300;
+        }
+
+        .sort-container {
+            max-width: 900px; margin: 0 auto 1rem;
+            text-align: center;
+        }
+        select {
+            padding: 0.8rem 1.5rem; border-radius: 25px;
+            border: none; font-size: 1.1em; background: rgba(255,255,255,0.9);
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .cars-container { grid-template-columns: 1fr; gap: 1.5rem; }
+            .header h1 { font-size: 2.5em; }
+            #searchInput { font-size: 1.3em; padding: 1.5rem 2rem; }
+            .filters { flex-direction: column; align-items: center; }
+            .stats-bar { flex-direction: column; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚗 PRUTHVIRAJ CAR SHOWROOM</h1>
+        <p>🏆 Hyderabad's #1 Premium Cars | Best Deals Guaranteed | 500+ Happy Customers</p>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat">🔥 50+ Cars <span style="font-size:1.2em">In Stock</span></div>
+        <div class="stat">💰 Up to <span style="color:#ffd700">30% OFF</span></div>
+        <div class="stat">⭐ 4.9/5 Rating</div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" 
+               placeholder="🔍 Search: Swift, Creta, SUV, Petrol, Red, Used..." 
+               autocomplete="off">
+        <div class="search-icon">🔍</div>
+    </div>
+
+    <div class="sort-container">
+        <select id="sortSelect">
+            <option value="name">Sort by Name</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="type">Sort by Type</option>
+        </select>
+    </div>
+
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all">All Cars</button>
+        <button class="filter-btn" data-filter="suv">SUV</button>
+        <button class="filter-btn" data-filter="hatchback">Hatchback</button>
+        <button class="filter-btn" data-filter="sedan">Sedan</button>
+        <button class="filter-btn" data-filter="petrol">Petrol</button>
+        <button class="filter-btn" data-filter="diesel">Diesel</button>
+        <button class="filter-btn" data-filter="electric">Electric</button>
+    </div>
+
+    <div class="cars-container" id="carsContainer">
+        <!-- Cars will be filtered here -->
+    </div>
+
+    <script>
+        const cars = [
+            { name: "Maruti Swift", type: "Hatchback", fuel: "Petrol", color: "Red", price: 7.5, priceDisplay: "₹7.5 Lakh", emoji: "🚗" },
+            { name: "Hyundai Creta", type: "SUV", fuel: "Diesel", color: "White", price: 14.5, priceDisplay: "₹14.5 Lakh", emoji: "🚙" },
+            { name: "Tata Nexon EV", type: "SUV", fuel: "Electric", color: "Blue", price: 13.5, priceDisplay: "₹13.5 Lakh", emoji: "🔋" },
+            { name: "Honda City", type: "Sedan", fuel: "Petrol", color: "Silver", price: 12.5, priceDisplay: "₹12.5 Lakh", emoji: "🚘" },
+            { name: "Mahindra XUV700", type: "SUV", fuel: "Petrol", color: "Black", price: 18.5, priceDisplay: "₹18.5 Lakh", emoji: "🚜" },
+            { name: "Used Innova Crysta", type: "MPV", fuel: "Diesel", color: "Grey", price: 9.5, priceDisplay: "₹9.5 Lakh", emoji: "🚐" },
+            { name: "Maruti Brezza", type: "SUV", fuel: "Petrol", color: "Orange", price: 9, priceDisplay: "₹9 Lakh", emoji: "🚙" },
+            { name: "Kia Seltos", type: "SUV", fuel: "Diesel", color: "Red", price: 11, priceDisplay: "₹11 Lakh", emoji: "🚙" },
+            { name: "Toyota Fortuner", type: "SUV", fuel: "Diesel", color: "White", price: 32.5, priceDisplay: "₹32.5 Lakh", emoji: "🚙" },
+            { name: "MG Hector", type: "SUV", fuel: "Petrol", color: "Red", price: 15.8, priceDisplay: "₹15.8 Lakh", emoji: "🚙" }
+        ];
+
+        let filteredCars = [...cars];
+        let currentSort = 'name';
+
+        function createCars() {
+            const container = document.getElementById('carsContainer');
+            container.innerHTML = '';
+            
+            filteredCars.forEach(car => {
+                const card = document.createElement('div');
+                card.className = 'car-card';
+                card.dataset.name = car.name.toLowerCase();
+                card.dataset.type = car.type.toLowerCase();
+                card.dataset.fuel = car.fuel.toLowerCase();
+                card.dataset.color = car.color.toLowerCase();
+                card.dataset.price = car.price;
+                card.innerHTML = `
+                    <div class="car-emoji">${car.emoji}</div>
+                    <div class="car-name">${car.name}</div>
+                    <div class="car-specs">
+                        <div>📏 ${car.type}</div>
+                        <div>⛽ ${car.fuel}</div>
+                        <div>🎨 ${car.color}</div>
+                        <div>${car.priceDisplay}</div>
+                    </div>
+                    <button class="book-btn" onclick="bookCar('${car.name}', '${car.priceDisplay}')">
+                        📞 Book Test Drive <span style="margin-left:10px">💨</span>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterCars();
+        });
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                filterCars();
+            });
+        });
+
+        // Sort functionality
+        document.getElementById('sortSelect').addEventListener('change', function() {
+            currentSort = this.value;
+            sortCars();
+            createCars();
+        });
+
+        function filterCars() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+
+            filteredCars = cars.filter(car => {
+                const matchesSearch = !query || 
+                    car.name.toLowerCase().includes(query) ||
+                    car.type.toLowerCase().includes(query) ||
+                    car.fuel.toLowerCase().includes(query) ||
+                    car.color.toLowerCase().includes(query);
+
+                const matchesFilter = activeFilter === 'all' || 
+                    car.type.toLowerCase().includes(activeFilter) ||
+                    car.fuel.toLowerCase().includes(activeFilter);
+
+                return matchesSearch && matchesFilter;
+            });
+
+            sortCars();
+            createCars();
+            showNoResults();
+        }
+
+        function sortCars() {
+            filteredCars.sort((a, b) => {
+                if (currentSort === 'price-low') return a.price - b.price;
+                if (currentSort === 'price-high') return b.price - a.price;
+                if (currentSort === 'type') return a.type.localeCompare(b.type);
+                return a.name.localeCompare(b.name);
+            });
+        }
+
+        function showNoResults() {
+            const container = document.getElementById('carsContainer');
+            const existingMsg = container.querySelector('.no-results');
+            
+            if (filteredCars.length === 0) {
+                if (!existingMsg) {
+                    const msg = document.createElement('div');
+                    msg.className = 'no-results';
+                    msg.innerHTML = `❌ No cars found!<br><span style="font-size:0.6em;margin-top:1rem">Try different keywords like "SUV", "Petrol", "Red" or clear filters</span>`;
+                    container.appendChild(msg);
+                }
+            } else if (existingMsg) {
+                existingMsg.remove();
+            }
+        }
+
+        function bookCar(carName, price) {
+            const message = `🎉 ${carName} Test Drive Booked!\n\n💰 Price: ${price}\n📞 Call: +91 98765-43210\n📱 WhatsApp: +91 98765-43210\n📍 Pruthviraj Car Showroom\n🏢 Hitech City, Hyderabad\n\n✅ We'll call you within 30 mins!`;
+            
+            if (confirm(message)) {
+                // You can integrate WhatsApp API here
+                window.open(`https://wa.me/919876543210?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+
+        // Initialize
+        createCars();
+    </script>
+</body>
+</html>
